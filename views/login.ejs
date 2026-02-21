@@ -19,7 +19,21 @@
 <body>
     <div class="card">
         <h2 style="text-align:center;margin:0 0 14px 0">Log in</h2>
-        <form action="/login" method="POST">
+                <% if (typeof errors !== 'undefined' && errors && errors.length) { %>
+                    <div style="background:#ffe6e6;color:#8b0000;padding:10px;border-radius:6px;margin-bottom:12px">
+                        <% errors.forEach(function(err){ %>
+                            <div><%= err %></div>
+                        <% }) %>
+                    </div>
+                <% } %>
+                <% if (typeof success !== 'undefined' && success && success.length) { %>
+                    <div style="background:#e6ffef;color:#056608;padding:10px;border-radius:6px;margin-bottom:12px">
+                        <% success.forEach(function(msg){ %>
+                            <div><%= msg %></div>
+                        <% }) %>
+                    </div>
+                <% } %>
+        <form action="/auth/login" method="POST">
             <div class="field">
                 <label for="username">Username</label>
                 <input id="username" name="username" required>
@@ -30,7 +44,7 @@
             </div>
             <button class="btn" type="submit">Log in</button>
         </form>
-        <div class="muted">Don't have an account? <a href="/register">Sign up</a></div>
+        <div class="muted">Don't have an account? <a href="/auth/register">Sign up</a></div>
     </div>
 </body>
 </html>

@@ -13,9 +13,9 @@ router.get('/register', (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res.render('register', { errors: ['Missing username or password'], success: [] });
+  const { username, password, name } = req.body;
+  if (!username || !password || !name) {
+    return res.render('register', { errors: ['Missing username, password, or name'], success: [] });
   }
   try{
     const exists = await User.findOne({username});
@@ -23,9 +23,9 @@ router.post('/register', async (req, res) => {
       return res.render('register', { errors: ['Username already exists'], success: [] });
     }
     const hash = await bcrypt.hash(password, 10);
-    const user = new User({username, name: username, password: hash});
+    const user = new User({username, name, password: hash});
     await user.save();
-    res.render('register', { errors: [], success: ['Account created successfully. Please log in.'] });
+    res.render('login', { errors: [], success: ['Account created successfully. Please log in.'] });
   } catch (err) {
     console.error('Registration error', err);
     res.render('register', { errors: ['An error occurred during registration'], success: [] });
