@@ -34,8 +34,12 @@
         <div class="logo"><a href="/">InstaClone</a></div>
         <nav class="center">
             <a href="/">Home</a>
-            <a href="/auth/create" style="margin-left:14px">New</a>
-            @<%= user ? user.username : 'guest' %>
+            <a href="/create" style="margin-left:14px">New</a>
+            <% if (user) { %>
+              <a href="/auth/profile" style="margin-left:14px">@<%= user.username %></a>
+            <% } else { %>
+              <span style="margin-left:14px">@guest</span>
+            <% } %>
             <a href="/auth/logout" style="margin-left:14px">Logout</a>
         </nav>
     </header>
@@ -72,6 +76,7 @@
                 </article>
             <% }) %>
         </section>
+
     </main>
 </body>
 </html>

@@ -60,4 +60,32 @@ router.get('/logout', (req, res) => {
   res.redirect('/auth/login');
 });
 
+// Profile route - shows user's own posts
+router.get('/profile', async (req, res) => {
+  const auth = require('../middleware/auth');
+  // This will be called with auth, so we need to wrap it
+  auth(req, res, async () => {
+    try {
+      const Post = require('../models/post');
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 6;
+      const skip = (page - 1) * limit;
+      
+      const posts = await Post.find({ user: req.user.id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+      const totalPosts = await Post.countDocuments({ user: req.user.id });
+      const totalPages = Math.ceil(totalPosts / limit);
+      
+      res.render('profile', { user: req.user, posts, currentPage: page, totalPages });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error fetching profile');
+    }
+  });
+});
+
 module.exports = router;

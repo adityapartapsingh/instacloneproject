@@ -65,6 +65,45 @@ router.post('/delete/:id', auth, async (req, res) => {
     }
 });
 
+router.get('/create', auth, (req, res) => {
+    res.render('upload', { user: req.user, errors: [], success: [] });
+});
+
+router.get('/edit/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).send('Post not found');
+        if (post.user.toString() !== req.user.id) {
+            return res.status(403).send('Unauthorized: You can only edit your own posts');
+        }
+        res.render('edit', { post, user: req.user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error loading post');
+    }
+});
+
+router.post('/edit/:id', auth, upload.single('postImage'), async (req, res) => {
+    try {
+        const { caption } = req.body;
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).send('Post not found');
+        if (post.user.toString() !== req.user.id) {
+            return res.status(403).send('Unauthorized: You can only edit your own posts');
+        }
+        
+        post.caption = caption || post.caption;
+        if (req.file) {
+            post.imagePath = `/uploads/${req.file.filename}`;
+        }
+        await post.save();
+        res.redirect('/');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error updating post');
+    }
+});
+
 router.get('/feed', auth, async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
